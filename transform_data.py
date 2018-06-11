@@ -55,10 +55,10 @@ with open(input_file) as input:
             if x[5] < minTemperature:
                 minTemperature = x[5]
             # 判断电流大小
-            if abs(x[6]) >= maxCurrent:
-                maxCurrent = abs(x[6])
-            if abs(x[6]) < minCurrent:
-                minCurrent = abs(x[6])
+            if x[6] >= maxCurrent:
+                maxCurrent = x[6]
+            if x[6] < minCurrent:
+                minCurrent = x[6]
             # 判断电压大小
             if x[7] >= maxVol:
                 maxVol = x[7]
@@ -166,7 +166,7 @@ with open(input_file) as input:
                             delta = date2 - date1
                             duration = (delta.days * 24 * 3600 + delta.seconds)
                             result = (x[0] + "," + negCurrentStartTime + "," + thisStartTime + "," + str(duration) + ","
-                                      + str(thisStartSOC) + "," + str(negCurrentStartSOC) + ", charge" + "," + str(
+                                      + str(negCurrentStartSOC) + "," + str(thisStartSOC) + ", charge" + "," + str(
                                         maxTemperature) + "," + str(minTemperature) +
                                       "," + str(maxCurrent) + "," + str(minCurrent) + "," + str(maxVol) + "," + str(
                                         minVol)) + "\n"
@@ -190,7 +190,7 @@ with open(input_file) as input:
                     delta = date2 - date1
                     duration = (delta.days * 24 * 3600 + delta.seconds)
                     result = (x[0] + "," + negCurrentStartTime + "," + lastTime + "," + str(duration) + ","
-                              + str(thisStartSOC) + "," + str(negCurrentStartSOC) + ", discharge" + "," + str(
+                              + str(negCurrentStartSOC) + "," + str(lastSOC) + ", charge" + "," + str(
                                 maxTemperature) + "," + str(minTemperature) +
                               "," + str(maxCurrent) + "," + str(minCurrent) + "," + str(maxVol) + "," + str(
                                 minVol)) + "\n"
@@ -205,7 +205,7 @@ with open(input_file) as input:
                     delta = date2 - date1
                     duration = (delta.days * 24 * 3600 + delta.seconds)
                     result = (x[0] + "," + thisStartTime + "," + lastTime + "," + str(duration) + ","
-                              + str(thisStartSOC) + "," + str(negCurrentStartSOC) + ", discharge" + "," + str(
+                              + str(thisStartSOC) + "," + str(lastSOC) + ", discharge" + "," + str(
                                 maxTemperature) + "," + str(minTemperature) +
                               "," + str(maxCurrent) + "," + str(minCurrent) + "," + str(maxVol) + "," + str(
                                 minVol)) + "\n"
