@@ -2,8 +2,8 @@
 import csv
 import time
 import datetime
-from pso.ipso import pso
 
+# 将10001737原始数据转为充放电数据
 
 def format2timestamp(raw_time):
     import time
@@ -40,10 +40,10 @@ pvalue = []  # 正电流首次出现时的数据
 nvalue = []  # 负电流首次出现时的数据
 COUNT = 5  # 判断充放需要的电正负电流次数
 TIMELIMIT = 30  # 时间间隔阈值，放电过程中前后两条数据的时间差大于阈值要切分数据
-pso_input_datas = []
+It_sum = 0.0  # 充放电电量总和
 
-output = open(output_file, 'w', encoding='utf8')
-result = u"ID, 开始时间, 结束时间, 时长, 开始SOC, 结束SOC, 状态, 最高温度, 最低温度, 最大电流, 最小电流, 最大电压, 最小电压, R0, OCV\n"
+output = open(output_file, 'w', encoding='utf-8-sig')
+result = u"ID, 开始时间, 结束时间, 时长, 开始SOC, 结束SOC, 状态, 最高温度, 最低温度, 最大电流, 最小电流, 最大电压, 最小电压, 电量\n"
 print(result)
 output.write(result)
 with open(input_file) as input:
@@ -76,6 +76,7 @@ with open(input_file) as input:
             if x[7] < minVol:
                 minVol = x[7]
 
+            It_sum += abs(x[6]) * 30 / 3600
             if isFirstData:
                 lastTime = x[1]
                 lastSOC = x[3]
@@ -127,21 +128,16 @@ with open(input_file) as input:
                             delta = date2 - date1
                             duration = (delta.days * 24 * 3600 + delta.seconds)
                             inputs = {'soc': thisStartSOC, 't': [], 'voltage': [], 'current': []}
-                            for data in pso_input_datas:
-                                date = data[1].replace('/', '-')
-                                inputs['t'].append(format2timestamp(date))
-                                inputs['voltage'].append(data[2])
-                                inputs['current'].append(data[3])
-                            best_solution = pso(inputs)
                             # discharge
                             result = (x[0] + "," + thisStartTime + "," + negCurrentStartTime + "," + str(duration) + ","
                                       + str(thisStartSOC) + "," + str(negCurrentStartSOC) + "," + str(0) + "," + str(
                                         maxTemperature) + "," + str(minTemperature) +
                                       "," + str(maxCurrent) + "," + str(minCurrent) + "," + str(maxVol) + "," + str(
-                                        minVol)) + "," + str(best_solution[3]) + "," + str(best_solution[0]) + "\n"
+                                        minVol)) + "," + str(It_sum) + "\n"
                             # 将结果写入csv
                             output.write(result)
                             print(result)
+                            It_sum = 0.0
                             maxTemperature = nvalue[4]
                             minTemperature = nvalue[5]
                             maxCurrent = nvalue[6]
@@ -149,8 +145,6 @@ with open(input_file) as input:
                             maxVol = nvalue[7]
                             minVol = nvalue[7]
                         ischarge = True
-                    if x[3] == negCurrentStartSOC + 1:
-                        pso_input_datas.append([x[3], x[1], x[7], x[6]])
                 else:
                     # 电流为正或0
                     if countP < COUNT:
@@ -186,21 +180,15 @@ with open(input_file) as input:
                             date2 = datetime.datetime(date2[0], date2[1], date2[2], date2[3], date2[4], date2[5])
                             delta = date2 - date1
                             duration = (delta.days * 24 * 3600 + delta.seconds)
-                            inputs = {'soc': thisStartSOC, 't': [], 'voltage': [], 'current': []}
-                            for data in pso_input_datas:
-                                date = data[1].replace('/', '-')
-                                inputs['t'].append(format2timestamp(date))
-                                inputs['voltage'].append(data[2])
-                                inputs['current'].append(data[3])
-                            best_solution = pso(inputs)
                             # charge
                             result = (x[0] + "," + negCurrentStartTime + "," + thisStartTime + "," + str(duration) + ","
                                       + str(negCurrentStartSOC) + "," + str(thisStartSOC) + "," + str(1) + "," + str(
                                         maxTemperature) + "," + str(minTemperature) +
                                       "," + str(maxCurrent) + "," + str(minCurrent) + "," + str(maxVol) + "," + str(
-                                        minVol)) + "," + str(best_solution[3]) + "," + str(best_solution[0]) + "\n"
+                                        minVol)) + "," + str(It_sum) + "\n"
                             # 将结果写入csv
                             output.write(result)
+                            It_sum = 0.0
                             print(result)
                             maxTemperature = pvalue[4]
                             minTemperature = pvalue[5]
@@ -209,8 +197,6 @@ with open(input_file) as input:
                             maxVol = pvalue[7]
                             minVol = pvalue[7]
                         ischarge = False
-                    if x[3] == thisStartSOC - 1:
-                        pso_input_datas.append([x[3], x[1], x[7], x[6]])
             else:
                 # 数据断档，重新开始
                 if ischarge and countN >= COUNT:
@@ -220,19 +206,12 @@ with open(input_file) as input:
                     date2 = datetime.datetime(date2[0], date2[1], date2[2], date2[3], date2[4], date2[5])
                     delta = date2 - date1
                     duration = (delta.days * 24 * 3600 + delta.seconds)
-                    inputs = {'soc': thisStartSOC, 't': [], 'voltage': [], 'current': []}
-                    for data in pso_input_datas:
-                        date = data[1].replace('/', '-')
-                        inputs['t'].append(format2timestamp(date))
-                        inputs['voltage'].append(data[2])
-                        inputs['current'].append(data[3])
-                    best_solution = pso(inputs)
                     # charge
                     result = (x[0] + "," + negCurrentStartTime + "," + lastTime + "," + str(duration) + ","
                               + str(negCurrentStartSOC) + "," + str(lastSOC) + "," + str(1) + "," + str(
                                 maxTemperature) + "," + str(minTemperature) +
                               "," + str(maxCurrent) + "," + str(minCurrent) + "," + str(maxVol) + "," + str(
-                                minVol)) + "," + str(best_solution[3]) + "," + str(best_solution[0]) + "\n"
+                                minVol)) + "," + str(It_sum) + "\n"
                     # 将结果写入csv
                     output.write(result)
                     print(result)
@@ -243,24 +222,18 @@ with open(input_file) as input:
                     date2 = datetime.datetime(date2[0], date2[1], date2[2], date2[3], date2[4], date2[5])
                     delta = date2 - date1
                     duration = (delta.days * 24 * 3600 + delta.seconds)
-                    inputs = {'soc': thisStartSOC, 't': [], 'voltage': [], 'current': []}
-                    for data in pso_input_datas:
-                        date = data[1].replace('/', '-')
-                        inputs['t'].append(format2timestamp(date))
-                        inputs['voltage'].append(data[2])
-                        inputs['current'].append(data[3])
-                    best_solution = pso(inputs)
                     # discharge
                     result = (x[0] + "," + thisStartTime + "," + lastTime + "," + str(duration) + ","
                               + str(thisStartSOC) + "," + str(lastSOC) + "," + str(0) + "," + str(
                                 maxTemperature) + "," + str(minTemperature) +
                               "," + str(maxCurrent) + "," + str(minCurrent) + "," + str(maxVol) + "," + str(
-                                minVol)) + "," + str(best_solution[3]) + "," + str(best_solution[0]) + "\n"
+                                minVol)) + "," + str(It_sum) + "\n"
                     # 将结果写入csv
                     output.write(result)
                     print(result)
 
                 isfirst = True
+                It_sum = 0.0
                 countN = 0
                 countP = 0
                 maxTemperature = x[4]
