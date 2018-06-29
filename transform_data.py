@@ -3,6 +3,7 @@ import csv
 import time
 import datetime
 
+
 # 将10001737原始数据转为充放电数据
 
 def format2timestamp(raw_time):
@@ -41,9 +42,11 @@ nvalue = []  # 负电流首次出现时的数据
 COUNT = 5  # 判断充放需要的电正负电流次数
 TIMELIMIT = 30  # 时间间隔阈值，放电过程中前后两条数据的时间差大于阈值要切分数据
 It_sum = 0.0  # 充放电电量总和
+discharge_data = []  # 放电数据
 
 output = open(output_file, 'w', encoding='utf-8-sig')
-result = u"ID, 开始时间, 结束时间, 时长, 开始SOC, 结束SOC, 状态, 最高温度, 最低温度, 最大电流, 最小电流, 最大电压, 最小电压, 电量\n"
+writer = csv.writer(output)
+result = u"ID,start_time,end_time,duration,start_SOC,end_SOC,state,max_temperature,min_temperature,max_current,min_current,max_vol,min_vol,Q\n"
 print(result)
 output.write(result)
 with open(input_file) as input:
@@ -127,15 +130,18 @@ with open(input_file) as input:
                             date2 = datetime.datetime(date2[0], date2[1], date2[2], date2[3], date2[4], date2[5])
                             delta = date2 - date1
                             duration = (delta.days * 24 * 3600 + delta.seconds)
-                            inputs = {'soc': thisStartSOC, 't': [], 'voltage': [], 'current': []}
                             # discharge
                             result = (x[0] + "," + thisStartTime + "," + negCurrentStartTime + "," + str(duration) + ","
                                       + str(thisStartSOC) + "," + str(negCurrentStartSOC) + "," + str(0) + "," + str(
                                         maxTemperature) + "," + str(minTemperature) +
                                       "," + str(maxCurrent) + "," + str(minCurrent) + "," + str(maxVol) + "," + str(
                                         minVol)) + "," + str(It_sum) + "\n"
+                            result_data = [x[0], thisStartTime, negCurrentStartTime, duration, thisStartSOC,
+                                           negCurrentStartSOC, 0, maxTemperature, minTemperature, maxCurrent, minCurrent
+                                , maxVol, minVol, It_sum]
+                            discharge_data.append(result_data)
                             # 将结果写入csv
-                            output.write(result)
+                            # output.write(result)
                             print(result)
                             It_sum = 0.0
                             maxTemperature = nvalue[4]
@@ -180,6 +186,23 @@ with open(input_file) as input:
                             date2 = datetime.datetime(date2[0], date2[1], date2[2], date2[3], date2[4], date2[5])
                             delta = date2 - date1
                             duration = (delta.days * 24 * 3600 + delta.seconds)
+                            discharge_data_len = len(discharge_data)
+                            if discharge_data_len > 0:
+                                It_sums = [dd[13] for dd in discharge_data]
+                                durations = [dd[3] for dd in discharge_data]
+                                result = (x[0] + "," + discharge_data[0][1] + "," +
+                                          discharge_data[discharge_data_len - 1][
+                                              1] + "," + str(
+                                            sum(durations)) + ","
+                                          + str(discharge_data[0][4]) + "," + str(
+                                            discharge_data[discharge_data_len - 1][5]) + "," + str(
+                                            0) + "," + str(
+                                            discharge_data[0][7]) + "," + str(discharge_data[0][8]) +
+                                          "," + str(discharge_data[0][9]) + "," + str(
+                                            discharge_data[0][10]) + "," + str(discharge_data[0][11]) + "," + str(
+                                            discharge_data[0][12])) + "," + str(sum(It_sums)) + "\n"
+                                output.write(result)
+                            discharge_data = []
                             # charge
                             result = (x[0] + "," + negCurrentStartTime + "," + thisStartTime + "," + str(duration) + ","
                                       + str(negCurrentStartSOC) + "," + str(thisStartSOC) + "," + str(1) + "," + str(
@@ -206,6 +229,22 @@ with open(input_file) as input:
                     date2 = datetime.datetime(date2[0], date2[1], date2[2], date2[3], date2[4], date2[5])
                     delta = date2 - date1
                     duration = (delta.days * 24 * 3600 + delta.seconds)
+                    discharge_data_len = len(discharge_data)
+                    if discharge_data_len > 0:
+                        It_sums = [dd[13] for dd in discharge_data]
+                        durations = [dd[3] for dd in discharge_data]
+                        result = (x[0] + "," + discharge_data[0][1] + "," + discharge_data[discharge_data_len - 1][
+                            1] + "," + str(
+                            sum(durations)) + ","
+                                  + str(discharge_data[0][4]) + "," + str(
+                                    discharge_data[discharge_data_len - 1][5]) + "," + str(
+                                    0) + "," + str(
+                                    discharge_data[0][7]) + "," + str(discharge_data[0][8]) +
+                                  "," + str(discharge_data[0][9]) + "," + str(
+                                    discharge_data[0][10]) + "," + str(discharge_data[0][11]) + "," + str(
+                                    discharge_data[0][12])) + "," + str(sum(It_sums)) + "\n"
+                        output.write(result)
+                    discharge_data = []
                     # charge
                     result = (x[0] + "," + negCurrentStartTime + "," + lastTime + "," + str(duration) + ","
                               + str(negCurrentStartSOC) + "," + str(lastSOC) + "," + str(1) + "," + str(
@@ -228,8 +267,12 @@ with open(input_file) as input:
                                 maxTemperature) + "," + str(minTemperature) +
                               "," + str(maxCurrent) + "," + str(minCurrent) + "," + str(maxVol) + "," + str(
                                 minVol)) + "," + str(It_sum) + "\n"
+                    result_data = [x[0], thisStartTime, negCurrentStartTime, duration, thisStartSOC,
+                                   negCurrentStartSOC, 0, maxTemperature, minTemperature, maxCurrent, minCurrent
+                        , maxVol, minVol, It_sum]
+                    discharge_data.append(result_data)
                     # 将结果写入csv
-                    output.write(result)
+                    # output.write(result)
                     print(result)
 
                 isfirst = True
@@ -252,7 +295,6 @@ with open(input_file) as input:
                     thisStartTime = pvalue[1]
                     thisStartSOC = pvalue[3]
                     isP = True
-                pso_input_datas = []
             lastTime = x[1]
             lastSOC = x[3]
 
