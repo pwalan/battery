@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
+from mpl_toolkits.mplot3d import Axes3D
 
 # 使用高斯回归过程预测房价
 # 创建数据集
