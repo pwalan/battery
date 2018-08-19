@@ -4,7 +4,7 @@ import csv
 
 def get_duration():
     b_id = "B0006"
-    root_path = "/Users/alanp/Downloads/"
+    root_path = "/Users/alanp/Downloads/battery/"
     # 根目录，此目录下包含编号为B00xx的电池的每次充放电详细信息。（每次充电或放电均为一张excel表格，记录每一时刻电池信息）
     root_dir = root_path + b_id
     lists = os.listdir(root_dir)  # 获取该目录下所有文件（即，每次充放电信息表）
@@ -75,7 +75,7 @@ def get_duration():
                         # TODO 获取恒流充电的第一个拐点
                         d_voltage = float(row[0]) - last_voltage
                         if d_voltage <= 0.001 and d_voltage != 0:
-                            vertical=-()
+                            vertical = -()
 
                         # 当电源电压小于1时，证明充or放电结束，不去处理
                         if voltage_charge > min_voltage_charge:
@@ -118,7 +118,10 @@ def get_duration():
                             break
 
                     # 将信息写入csv文件  list[i]为文件名。
-                    slope = (voltage[count] - voltage[count - 60]) / (all_time[count] - all_time[count - 60])
+                    try:
+                        slope = (voltage[count] - voltage[count - 60]) / (all_time[count] - all_time[count - 60])
+                    except IndexError:
+                        continue
                     vertical_before = (vertical_voltage_over - vertical_voltage_start) / (
                             vertical_time_over - vertical_time_start)
                     final_time = last_time - first_time

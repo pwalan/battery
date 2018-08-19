@@ -2,8 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-input_path = '/Users/alanp/Downloads/B0006/B0006_3_charge_24.csv'
-output_path = '/Users/alanp/Downloads/tmp.csv'
+input_path = '/Users/alanp/Downloads/battery/B0006/B0006_80_charge_24.csv'
+output_path = '/Users/alanp/Downloads/battery/tmp.csv'
 # 读入数据
 data = pd.read_csv(input_path, header=1,
                    names=['v', 'i', 'c', 'i1', 'v1', 't'])
@@ -12,8 +12,8 @@ indexs = data[data['v'] > 4.2].index
 # 截取出恒流充电的数据
 X = data['t'][:indexs[0]].values
 Y = data['v'][:indexs[0]].values
-# 使用9次多项式拟合曲线
-z = np.polyfit(X, Y, 9)
+# 使用多项式拟合曲线
+z = np.polyfit(X, Y, 15)
 # 求拟合后曲线上各时间点对应的电压值
 Yvals = np.polyval(z, X)
 
@@ -24,7 +24,10 @@ D_2 = np.poly1d(z).deriv(m=2)
 Dvals2 = np.polyval(D_2, X)
 # 写入csv
 tmp = pd.DataFrame({'x': X, 'd1': Dvals1, 'd2': Dvals2})
-tmp.to_csv(output_path)
+# tmp.to_csv(output_path)
+fbs_Davls2 = np.fabs(Dvals2)
+index_time = np.argwhere(fbs_Davls2 < 0.000000005)
+print(index_time)
 
 # 绘制拟合的曲线和实际数据
 plt.scatter(X, Y, label='real data')
