@@ -12,6 +12,9 @@ indexs = data[data['v'] > 4.2].index
 # 截取出恒流充电的数据
 X = data['t'][:indexs[0]].values
 Y = data['v'][:indexs[0]].values
+# 截取恒压充电数据
+# X = data['t'][indexs[0]:].values
+# Y = data['i'][indexs[0]:].values
 # 使用多项式拟合曲线
 z = np.polyfit(X, Y, 15)
 # 求拟合后曲线上各时间点对应的电压值
