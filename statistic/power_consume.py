@@ -93,8 +93,8 @@ def main(params):
     plt.plot(x, late, '*-', label='late')
     plt.plot(x, usual, 's-', label='usual')
     plt.xlabel("date")
-    plt.ylabel("power consumtion")
-    plt.title('VEHICLE NO.' + str(vid) + ' Power Consumtion')
+    plt.ylabel("power consumption")
+    plt.title('VEHICLE NO.' + str(vid) + ' Power Consumption')
     ax = plt.gca()  # 表明设置图片的各个轴，plt.gcf()表示图片本身
     ax.xaxis.set_major_formatter(mdate.DateFormatter('%Y-%m-%d'))  # 横坐标标签显示的日期格式
     plt.xticks(pd.date_range(x[0], x[-1], freq='1D')) # 设置x轴时间间隔
