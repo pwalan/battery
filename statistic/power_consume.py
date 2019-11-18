@@ -5,11 +5,15 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from datetime import datetime
 import matplotlib.dates as mdate
+import json
+import uuid
 
 
 def main(params):
     print(params)
-    pic_url = "/home/pic/1.jpg"
+    json_str = json.dumps(params)
+    params = json.loads(json_str)
+    pic_url = "/home/pic/" + str(uuid.uuid1()) + ".jpg"
 
     early_start = ' 07:00:00'
     early_end = ' 09:00:00'
@@ -19,8 +23,8 @@ def main(params):
     db = pymysql.connect("10.103.244.129", "root", "yang1290", "baas")
     cursor = db.cursor()
 
-    vid = 1
-    dates = ['2019-08-13', '2019-08-14', '2019-08-15', '2019-08-16', '2019-08-17']
+    vid = params['vehicleId']
+    dates = params['dates'].split('|')
     early = []
     late = []
     usual = []
@@ -97,16 +101,17 @@ def main(params):
     plt.title('VEHICLE NO.' + str(vid) + ' Power Consumption')
     ax = plt.gca()  # 表明设置图片的各个轴，plt.gcf()表示图片本身
     ax.xaxis.set_major_formatter(mdate.DateFormatter('%Y-%m-%d'))  # 横坐标标签显示的日期格式
-    plt.xticks(pd.date_range(x[0], x[-1], freq='1D')) # 设置x轴时间间隔
+    plt.xticks(pd.date_range(x[0], x[-1], freq='1D'))  # 设置x轴时间间隔
     plt.gcf().autofmt_xdate()  # 自动旋转日期标记
     plt.legend()
     plt.show()
+    # plt.savefig(pic_url)
 
     return pic_url
 
 
 if __name__ == '__main__':
     # params = sys.argv[1]
-    params = ""
+    params = {'dates': '2019-08-13|2019-08-14|2019-08-15|2019-08-16|2019-08-17', 'vehicleId': 1}
     pic_url = main(params)
     print(pic_url)

@@ -2,19 +2,21 @@
 
 import pymysql
 import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
+import json
+import uuid
 
 
 def main(params):
     print(params)
-    pic_url = "/home/pic/1.jpg"
+    json_str = json.dumps(params)
+    params = json.loads(json_str)
+    pic_url = "/home/pic/" + str(uuid.uuid1()) + ".jpg"
 
     db = pymysql.connect("10.103.244.129", "root", "yang1290", "baas")
     cursor = db.cursor()
 
-    vid = 1
-    dates = ['2019-08-13']
+    vid = params['vehicleId']
+    dates = params['dates'].split('|')
     start_time = ' 00:00:00'
     end_time = ' 23:59:59'
     charge = []
@@ -61,11 +63,12 @@ def main(params):
     fig.tight_layout()
     fig.set_dpi(150)
     plt.show()
+    # plt.savefig(pic_url)
     return pic_url
 
 
 if __name__ == '__main__':
     # params = sys.argv[1]
-    params = ""
+    params = {'dates': '2019-08-13', 'vehicleId': 1}
     pic_url = main(params)
     print(pic_url)
