@@ -122,6 +122,7 @@ def main(params):
     ax.xaxis.set_major_formatter(mdate.DateFormatter('%Y-%m-%d'))  # 横坐标标签显示的日期格式
     plt.xticks(pd.date_range(x[0], x[-1], freq='1D'))  # 设置x轴时间间隔
     plt.gcf().autofmt_xdate()  # 自动旋转日期标记
+    plt.grid()
     plt.legend()
     # TODO 取消show，开启存储
     plt.show()

@@ -45,6 +45,7 @@ def main(params):
     fig = plt.figure()
     # 充电电流分布
     plt.subplot(2, 1, 1)
+    plt.grid()
     bins = range(-350, 0, 10)
     plt.xlim(-350, 0)
     plt.title("车辆编号为 " + str(vid) + " 的充电电流分布")
@@ -58,6 +59,7 @@ def main(params):
 
     # 放电点流分布
     plt.subplot(2, 1, 2)
+    plt.grid()
     bins = range(0, 350, 10)
     plt.xlim(0, 350)
     plt.title("车辆编号为 " + str(vid) + " 的放电电流分布")
@@ -74,7 +76,7 @@ def main(params):
     fig.set_dpi(150)
     # TODO 取消show，开启保存
     plt.show()
-    # plt.savefig(pic_url)
+    # plt.savefig(picurl)
     f.write(
         "频率," + str(list(prob1)).replace("[", "").replace("]", "") + str(list(prob2)).replace("[", "").replace("]", ""))
     f.close()
