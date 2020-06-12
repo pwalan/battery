@@ -15,7 +15,7 @@ def format2timestamp(raw_time):
     return nat_time
 
 
-filename = '/Users/alanp/Downloads/param/mgl.csv'
+filename = '/Users/alanp/Downloads/param/mgl10.csv'
 
 datas = []
 
@@ -25,7 +25,10 @@ with open(filename) as f:
     header_row = next(reader)
 
     for row in reader:
-        datas.append([row[0], float(row[1]), float(row[2]), float(row[3])])
+        try:
+            datas.append([row[0], float(row[1]), float(row[2]), float(row[3])])
+        except:
+            print("Data Error")
 
 inputs = []
 if len(datas) > 10:

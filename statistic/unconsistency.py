@@ -13,7 +13,11 @@ t2 = [int(x) for x in st2.split("|")]
 u2 = [float(x) for x in su2.split("|")]
 
 table = PrettyTable(["Date", "U_std", "Umax-Umin", "T_std", "Tmax-Tmin"])
-table.add_row(["2018/01/08", np.std(u1), np.max(u1) - np.min(u1), np.std(t1), np.max(t1) - np.min(t1)])
-table.add_row(["2018/12/10", np.std(u2), np.max(u2) - np.min(u2), np.std(t2), np.max(t2) - np.min(t2)])
-
+table.add_row(["2018/01/08", np.std(u1), np.max(u1) - np.min(u1), np.std(t1) * 0.01, (np.max(t1) - np.min(t1)) * 0.001])
+table.add_row(["2018/12/10", np.std(u2), np.max(u2) - np.min(u2), np.std(t2) * 0.01, (np.max(t2) - np.min(t2)) * 0.001])
 print(table)
+a = np.std(u1) + (np.max(u1) - np.min(u1)) + np.std(t1) * 0.01 + (np.max(t1) - np.min(t1)) * 0.001
+b = np.std(u2) + (np.max(u2) - np.min(u2)) + np.std(t2) * 0.01 + (np.max(t2) - np.min(t2)) * 0.001
+print(a)
+print(b)
+print(b > 0.15)

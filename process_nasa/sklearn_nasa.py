@@ -217,7 +217,7 @@ def elasticnet_train(bid, train_size):
 
 
 def elasticnet_train2(train_bids, test_bid):
-    test_data, train_X, train_Y, test_X, test_Y = get_data2(train_bids, test_bid)
+    test_data, train_X, train_Y, test_X, test_Y = (train_bids, test_bid)
     # elasticnet = linear_model.ElasticNetCV(alphas=[0.0001, 0.0005, 0.001, 0.01, 0.1, 1, 10],
     #                                        l1_ratio=[.01, .1, .5, .9, .99], max_iter=5000).fit(train_X, train_Y)
     elasticnet = linear_model.LassoCV().fit(train_X, train_Y)

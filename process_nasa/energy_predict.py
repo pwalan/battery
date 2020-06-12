@@ -79,7 +79,7 @@ def get_data(vid, test_size):
 
 def get_data_all():
     data = pd.read_csv(
-        '/Users/alanp/Competition/创客工厂/2018全国高校新能源汽车大数据创新创业大赛/数据/创新题/energy_predict_data/finals/energy_train1029.csv',
+        '/Users/alanp/Desktop/energy_train1029.csv',
         header=0)
     data = process_data(data)
     # data.to_csv('train.csv', index=False)
@@ -101,7 +101,7 @@ def get_data_all():
     # test_Y = data_origin["charge_energy"]
 
     valid_data = pd.read_csv(
-        '/Users/alanp/Competition/创客工厂/2018全国高校新能源汽车大数据创新创业大赛/数据/创新题/energy_predict_data/finals/energy_test1029.csv',
+        '/Users/alanp/Desktop/energy_test1029.csv',
         header=0)
     valid_data = process_data(valid_data)
     valid_data_origin = valid_data
